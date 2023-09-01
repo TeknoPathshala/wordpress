@@ -29,6 +29,12 @@ pipeline {
                 sh './wordpress-install.sh'
             }
         }
+        stage('Remove Existing Configure Apache Script') {
+            steps {
+                // Remove the Apache configuration script from the workspace if it exists
+                sh 'rm -f $WORKSPACE/configure-apache.sh'
+            }
+        }
         stage('Move Configure Apache Script') {
             steps {
                 // Move the Apache configuration script to the workspace
