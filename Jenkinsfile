@@ -6,8 +6,6 @@ pipeline {
         // Define the GitHub repository URL and script URL
         GITHUB_REPO_URL = 'https://github.com/TeknoPathshala/wordpress.git'
         SCRIPT_URL = 'https://raw.githubusercontent.com/TeknoPathshala/wordpress/main/wordpress-install.sh'
-        // Define the full path to the configure-apache.sh script
-        CONFIGURE_APACHE_SCRIPT = '/var/lib/jenkins/workspace/wordpress/configure-apache.sh'
     }
     stages {
         stage('Checkout') {
@@ -33,8 +31,8 @@ pipeline {
         }
         stage('Configure Apache') {
             steps {
-                // Execute the Apache configuration script with sudo
-                sh "sudo ${CONFIGURE_APACHE_SCRIPT}"
+                // Execute the Apache configuration script with sudo using the correct path
+                sh "sudo /var/lib/jenkins/workspace/wordpress/configure-apache.sh"
             }
         }
         stage('Access WordPress Website') {
