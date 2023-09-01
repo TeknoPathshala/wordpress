@@ -3,24 +3,38 @@ pipeline {
     environment {
         // Define the WordPress domain name or IP address
         WORDPRESS_DOMAIN = '192.168.1.253'
+        // Define the GitHub repository URL and script URL
+        GITHUB_REPO_URL = 'https://github.com/TeknoPathshala/wordpress.git'
+        SCRIPT_URL = 'https://raw.githubusercontent.com/TeknoPathshala/wordpress/main/wordpress-install.sh'
     }
     stages {
         stage('Checkout') {
             steps {
                 // Checkout your GitHub repository
-                checkout scm
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'your-credentials-id', url: "${GITHUB_REPO_URL}"]]])
+            }
+        }
+        stage('Fetch WordPress Installation Script') {
+            steps {
+                // Fetch the WordPress installation script
+                sh "wget -O wordpress-install.sh ${SCRIPT_URL}"
+                
+                // Make the script executable
+                sh "chmod +x wordpress-install.sh"
             }
         }
         stage('Install WordPress') {
             steps {
-                // Run your WordPress installation script directly from the workspace
-                sh 'chmod +x wordpress-install.sh' // Ensure the script is executable
+                // Execute the WordPress installation script
                 sh './wordpress-install.sh'
             }
         }
         stage('Configure Apache') {
             steps {
                 script {
+                    // Create the directory if it doesn't exist
+                    sh "sudo mkdir -p /etc/apache2/sites-available/"
+
                     // Define the virtual host configuration as a multi-line string
                     def virtualHostConfig = """
 <VirtualHost *:80>
