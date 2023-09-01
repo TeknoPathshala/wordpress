@@ -3,12 +3,21 @@ pipeline {
     environment {
         // Define the WordPress domain name or IP address
         WORDPRESS_DOMAIN = '192.168.1.253'
+        // Define the GitHub repository URL and script URL
+        GITHUB_REPO_URL = 'https://github.com/TeknoPathshala/wordpress.git'
+        SCRIPT_URL = 'https://raw.githubusercontent.com/TeknoPathshala/wordpress/main/wordpress-install.sh'
     }
     stages {
         stage('Checkout') {
             steps {
                 // Checkout your GitHub repository
-                checkout scm
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'your-credentials-id', url: "${GITHUB_REPO_URL}"]]])
+            }
+        }
+        stage('Fetch WordPress Installation Script') {
+            steps {
+                // Fetch the WordPress installation script
+                sh "wget -O wordpress-install.sh ${SCRIPT_URL}"
             }
         }
         stage('Install WordPress') {
