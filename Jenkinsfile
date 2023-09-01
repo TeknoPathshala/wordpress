@@ -29,14 +29,17 @@ pipeline {
                 sh './wordpress-install.sh'
             }
         }
-        stage('Configure Apache') {
+        stage('Move Configure Apache Script') {
             steps {
-                // Copy the Apache configuration script to the workspace
-                sh 'cp configure-apache.sh $WORKSPACE'
+                // Move the Apache configuration script to the workspace
+                sh 'mv configure-apache.sh $WORKSPACE'
 
                 // Make the script executable
                 sh 'chmod +x $WORKSPACE/configure-apache.sh'
-
+            }
+        }
+        stage('Configure Apache') {
+            steps {
                 // Execute the Apache configuration script
                 sh '$WORKSPACE/configure-apache.sh'
             }
