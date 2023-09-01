@@ -31,8 +31,13 @@ pipeline {
         }
         stage('Configure Apache') {
             steps {
-                // Execute the Apache configuration script
-                sh './configure-apache.sh'
+                // Execute the Apache configuration script with sudo
+                script {
+                    def configureCommand = """
+                    sudo ./configure-apache.sh
+                    """
+                    sh configureCommand
+                }
             }
         }
         stage('Access WordPress Website') {
