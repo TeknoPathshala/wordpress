@@ -19,8 +19,9 @@ pipeline {
         }
         stage('Configure Apache') {
             steps {
-                // Configure Apache to serve WordPress
-                sh "sudo tee /etc/apache2/sites-available/${WORDPRESS_DOMAIN}.conf > /dev/null <<EOF
+                script {
+                    // Define the virtual host configuration as a multi-line string
+                    def virtualHostConfig = """
 <VirtualHost *:80>
     ServerAdmin webmaster@${WORDPRESS_DOMAIN}
     DocumentRoot /var/www/html/wordpress
@@ -36,11 +37,24 @@ pipeline {
     ErrorLog \${APACHE_LOG_DIR}/${WORDPRESS_DOMAIN}-error.log
     CustomLog \${APACHE_LOG_DIR}/${WORDPRESS_DOMAIN}-access.log combined
 </VirtualHost>
-EOF"
-                // Enable the virtual host and restart Apache
-                sh "sudo a2ensite ${WORDPRESS_DOMAIN}.conf"
-                sh "sudo a2enmod rewrite"
-                sh "sudo systemctl restart apache2"
+"""
+
+                    // Use 'echo' to print the multi-line string and write it to the file
+                    sh """echo '''${virtualHostConfig}''' | sudo tee /etc/apache2/sites-available/${WORDPRESS_DOMAIN}.conf > /dev/null"""
+
+                    // Enable the virtual host and restart Apache
+                    sh "sudo a2ensite ${WORDPRESS_DOMAIN}.conf"
+                    sh "sudo a2enmod rewrite"
+                    sh "sudo systemctl restart apache2"
+                }
+            }
+        }
+        stage('Access WordPress Website') {
+            steps {
+                // Display the URL for accessing the WordPress website
+                script {
+                    echo "You can access your WordPress website at: http://${WORDPRESS_DOMAIN}"
+                }
             }
         }
     }
